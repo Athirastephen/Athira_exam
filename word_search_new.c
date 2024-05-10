@@ -1,3 +1,4 @@
+//header files//
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,42 +12,43 @@
 char grid[ROWS][COLS];
 
 // Function to convert a word to lowercase and remove punctuation
-void sanitizeWord(char *word) {
+void Wordconversion(char *word) {
     int i, j = 0;
     for (i = 0; word[i]; i++) {
-        if (isalpha(word[i])) {
-            word[j++] = tolower(word[i]);
+        if (isalpha(word[i])) { // Check if character is alphabetic
+            word[j++] = tolower(word[i]); // Convert to lowercase
         }
     }
-    word[j] = '\0';
+    word[j] = '\0'; // Null-terminate the string
 }
 
 // Function to check if a word is present in the grid
 int isWordPresent(char *word) {
     int len = strlen(word);
     int i, j, k;
-    int visited[ROWS][COLS];
+    int word_arr[ROWS][COLS];
 
-    sanitizeWord(word); // Convert word to lowercase and remove punctuation
+    Wordconversion(word); // Convert word to lowercase and remove punctuation
 
     for (i = 0; i < ROWS; i++) {
         for (j = 0; j < COLS; j++) {
             if (grid[i][j] == word[0]) {
+				// Directions: Up, Down, Left, Right, Diagonal
                 int dirRow[] = { -1, -1, -1, 0, 0, 1, 1, 1 };
                 int dirCol[] = { -1, 0, 1, -1, 1, -1, 0, 1 };
                 for (k = 0; k < 8; k++) {
                     int row = i + dirRow[k];
                     int col = j + dirCol[k];
                     int pos = 1;
-                    memset(visited, 0, sizeof(visited));
+                    memset(word_arr, 0, sizeof(word_arr)); // Initialize array
                     while (pos < len && row >= 0 && row < ROWS && col >= 0 && col < COLS &&
-                           grid[row][col] == word[pos] && !visited[row][col]) {
-                        visited[row][col] = 1;
+                           grid[row][col] == word[pos] && !word_arr[row][col]) {
+                        word_arr[row][col] = 1; // Mark the cell
                         pos++;
-                        row += dirRow[k];
+                        row += dirRow[k]; // Move to the next cell
                         col += dirCol[k];
                     }
-                    if (pos == len) return 1;
+                    if (pos == len) return 1; // Word found
                 }
             }
         }
@@ -75,23 +77,24 @@ void findWordsInGrid(char *wordListFile) {
 }
 
 int main(int argc, char *argv[]) {
+	// Check the number of command-line arguments
     if (argc != 3) {
         printf("Usage: %s <word_list_file> <grid_characters>\n", argv[0]);
         return 1;
     }
-
+ // Check the length of the grid characters
     if (strlen(argv[2]) != MAX_GRID_SIZE) {
         printf("Invalid grid. Grid should have 16 characters.\n");
         return 1;
     }
-
+//  grid with characters
     int i, j, k = 0;
     for (i = 0; i < ROWS; i++) {
         for (j = 0; j < COLS; j++) {
             grid[i][j] = argv[2][k++];
         }
     }
-
+// Find and print words in the grid from the word list file
     findWordsInGrid(argv[1]);
 
     return 0;
